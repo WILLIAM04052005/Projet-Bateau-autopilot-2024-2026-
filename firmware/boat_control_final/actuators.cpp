@@ -1,6 +1,4 @@
-// =====================================================================
 //  actuators.cpp — Propulsion (BTS7960) et direction (servo du safran)
-// =====================================================================
 #include "actuators.h"
 #include "config.h"
 #include <ESP32Servo.h>
@@ -11,9 +9,8 @@ bool motorOn = false;
 
 static Servo rudderServo;
 
-// ------------------------------ Moteur -------------------------------
+// Moteur 
 void initMotor() {
-  // API LEDC de l'ESP32 Arduino core 3.x : un canal PWM par broche
   ledcAttach(RPWM, PWM_FREQ, PWM_RESOLUTION);
   ledcAttach(LPWM, PWM_FREQ, PWM_RESOLUTION);
   ledcWrite(RPWM, 0);
@@ -38,14 +35,12 @@ void applyMotor() {
   }
 }
 
-// ------------------------------ Safran -------------------------------
+// Safran
 void initRudder() {
   rudderServo.attach(SERVO_PIN);
   rudderServo.write(SERVO_CENTER);
 }
 
-// Limite la vitesse de rotation du servo (SERVO_STEP degrés toutes les
-// SERVO_UPDATE_MS ms) pour éviter les à-coups et les pics de courant.
 void applyServo(int angle) {
   static unsigned long lastMove = 0;
   if (millis() - lastMove < SERVO_UPDATE_MS) return;

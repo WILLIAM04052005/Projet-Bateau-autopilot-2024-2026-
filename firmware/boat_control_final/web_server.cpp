@@ -1,17 +1,3 @@
-// =====================================================================
-//  web_server.cpp — Wi-Fi et API HTTP du bateau
-//
-//  Routes (toutes en GET) :
-//    /                         interface web (web_page.h)
-//    /motor?on=0|1             marche / arrêt de la propulsion
-//    /dir?d=fwd|rev|stop       sens de rotation
-//    /speed?val=0..255         puissance moteur (PWM)
-//    /servo?angle=0..180       angle du safran (mode manuel)
-//    /autopilot?active=0|1&heading=0..359
-//    /calibrate                le cap actuel devient le Nord (0°)
-//    /mag        → {"ok","x","y","z","heading"}
-//    /speed_data → {"rpm","speed","current"}
-// =====================================================================
 #include "web_server.h"
 #include <WiFi.h>
 #include "actuators.h"
@@ -29,7 +15,7 @@
 
 static WiFiServer server(80);
 
-// ----------------------------- Wi-Fi ---------------------------------
+// Wi-Fi 
 static void startAccessPoint() {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(AP_SSID, AP_PASSWORD);
@@ -70,9 +56,6 @@ void initWebServer() {
   Serial.println("    ✓ Serveur HTTP démarré sur port 80\n");
 }
 
-// ------------------------ Outils de parsing ---------------------------
-// Renvoie la valeur du paramètre « key= » dans la ligne de requête
-// (ex. "GET /speed?val=120 HTTP/1.1"), jusqu'au prochain '&' ou espace.
 static bool queryParam(const String& req, const char* key, String& value) {
   int idx = req.indexOf(key);
   if (idx < 0) return false;
@@ -94,7 +77,7 @@ static void sendJson(WiFiClient& client, const String& json) {
   client.println(json);
 }
 
-// ------------------------------ Routes --------------------------------
+// Routes 
 static void handleClient(WiFiClient client) {
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');

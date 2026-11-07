@@ -1,9 +1,3 @@
-// =====================================================================
-//  autopilot.cpp — Maintien de cap par régulateur PID sur le safran
-//
-//  erreur = cap_consigne − cap_mesuré   (ramenée dans [−180°, 180°])
-//  angle_safran = 90° + Kp·e + Ki·∫e·dt + Kd·de/dt   (borné 65°–115°)
-// =====================================================================
 #include "autopilot.h"
 #include "actuators.h"
 #include "config.h"
@@ -27,25 +21,22 @@ void autopilotControl() {
 
   unsigned long now = millis();
   float dt = (now - lastPIDTime) / 1000.0;
-  if (dt < PID_PERIOD_S) return;  // cadence 20 Hz
+  if (dt < PID_PERIOD_S) return;  
   lastPIDTime = now;
 
   // Cap mesuré, filtré
   currentHeading = smoothHeading(calculateHeading());
 
-  // Erreur de cap, chemin le plus court
   float error = targetHeading - currentHeading;
   if (error > 180) error -= 360;
   if (error < -180) error += 360;
 
-  // Zone morte : on ne corrige pas les petites erreurs (évite l'usure du servo
-  // et les oscillations dues aux vagues)
   if (abs(error) < HEADING_DEADBAND) {
     applyServo(SERVO_CENTER);
     return;
   }
 
-  // ----- PID -----
+  //PID control
   float P = KP * error;
 
   integralError += error * dt;

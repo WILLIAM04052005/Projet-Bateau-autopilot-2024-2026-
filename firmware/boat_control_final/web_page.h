@@ -1,7 +1,3 @@
-// =====================================================================
-// FICHIER GÉNÉRÉ AUTOMATIQUEMENT — NE PAS MODIFIER À LA MAIN
-// Source : web/index.html (+ CSS/JS)  ·  Générateur : tools/build_web.py
-// =====================================================================
 #pragma once
 #include <Arduino.h>
 

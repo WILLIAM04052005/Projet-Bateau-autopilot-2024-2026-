@@ -1,18 +1,14 @@
-// =====================================================================
-//  sensors.cpp — Capteurs : vitesse (LM393), courant (ACS758), cap (BMM150)
-// =====================================================================
 #include "sensors.h"
 #include "config.h"
 #include <Wire.h>
 #include <bmm150.h>
 
-// ============================== VITESSE ==============================
+// VITESSE 
 static volatile int pulseCount = 0;
 static unsigned long lastSpeedCalc = 0;
 int currentRPM = 0;
 float currentSpeed = 0.0;
 
-// Interruption : une impulsion à chaque passage dans la fourche optique
 static void IRAM_ATTR countPulse() {
   pulseCount++;
 }
@@ -36,7 +32,7 @@ void calculateSpeed() {
   }
 }
 
-// ============================== COURANT ==============================
+// COURANT
 float currentAmperes = 0.0;
 static unsigned long lastCurrentRead = 0;
 
@@ -61,7 +57,7 @@ void updateCurrent() {
   }
 }
 
-// =========================== MAGNÉTOMÈTRE ============================
+// MAGNÉTOMÈTRE
 static BMM150 bmm = BMM150();
 int magX = 0, magY = 0, magZ = 0;
 bool magInitialized = false;
@@ -143,7 +139,6 @@ float calculateHeading() {
   return heading;
 }
 
-// Moyenne glissante sur les HEADING_SMOOTHING dernières mesures
 float smoothHeading(float newHeading) {
   headingHistory[headingIndex] = newHeading;
   headingIndex = (headingIndex + 1) % HEADING_SMOOTHING;
