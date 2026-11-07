@@ -1,6 +1,3 @@
-// Boat Control — logique de l'interface web (pilotage manuel, autopilote, télémétrie)
-// Communique avec le serveur HTTP de l'ESP32 via fetch() : voir firmware/README.md (API).
-
 var mot = false;
 var curDir = 'stop';
 var curHead = 0;

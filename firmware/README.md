@@ -23,11 +23,8 @@ firmware/
 └── historique/                ← versions successives, telles qu'écrites pendant le projet
     ├── v1_capteur_vitesse/
     ├── v2_capteur_courant/
-    ├── v3_final_original/       version finale d'origine (un seul fichier)
     └── prototype_api_rest_json/ essai d'API REST JSON (POST /command) pour une interface React
 ```
-
-> `boat_control_final/` reprend **exactement la même logique** que `historique/v3_final_original/`, découpée en modules. Le HTML, le CSS et le JavaScript sortent de la chaîne C++ pour devenir de vrais fichiers, et les identifiants Wi-Fi passent dans `secrets.h`, qui n'est pas publié.
 
 ## Matériel et brochage
 
