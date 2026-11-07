@@ -3,42 +3,36 @@
 #include <Wire.h>
 #include <bmm150.h>
 
-// ================= I2C PINS =================
 #define I2C_SDA 22
 #define I2C_SCL 21
 
-// ================= SERVO (CODE A) =================
 Servo myServo;
 const int servoPin = 18;
 
-// ================= SPEED SENSOR =================
-#define SENSOR_PIN 27  // Broche connectée à DO du capteur de vitesse
+#define SENSOR_PIN 27 
 volatile int pulseCount = 0;
 unsigned long lastSpeedCalc = 0;
 int currentRPM = 0;
-float currentSpeed = 0.0;  // Vitesse en km/h ou nœuds selon calibration
+float currentSpeed = 0.0;  
 
-// Calibration du capteur (à ajuster selon votre capteur et hélice)
-const float PULSES_PER_ROTATION = 1.0;  // Nombre d'impulsions par tour
-const float SPEED_CALIBRATION = 0.1;    // Facteur de conversion RPM -> vitesse (à calibrer)
+const float PULSES_PER_ROTATION = 1.0; 
+const float SPEED_CALIBRATION = 0.1;   
 
-// Fonction d'interruption pour compter les impulsions
 void IRAM_ATTR countPulse() {
   pulseCount++;
 }
 
-// ================= WIFI =================
 #define USE_AP_MODE true
 
-const char* STA_SSID = "VotreReseau";        // identifiant masqué pour la publication
-const char* STA_PASSWORD = "VotreMotDePasse"; // mot de passe masqué pour la publication
+const char* STA_SSID = "VotreReseau";        
+const char* STA_PASSWORD = "VotreMotDePasse"; 
 
 const char* AP_SSID = "BoatControl";
 const char* AP_PASSWORD = "12345678";
 
 WiFiServer server(80);
 
-// ================= BTS7960 MOTEUR =================
+// BTS7960 MOTEUR
 #define RPWM 25
 #define LPWM 26
 
@@ -50,11 +44,11 @@ int speedVal = 0;
 int heading = 180;
 bool motorOn = false;
 
-// ================= VARIABLES AUTOPILOT =================
+// VARIABLES AUTOPILOT 
 bool autopilotActive = false;
 int targetHeading = 0;
 
-// ================= MAGNETOMETER =================
+// MAGNETOMETER 
 BMM150 bmm = BMM150();
 bmm150_mag_data magValue;
 
@@ -63,7 +57,6 @@ int magY = 0;
 int magZ = 0;
 bool magInitialized = false;
 
-// ================= HEADING / AUTOPILOT =================
 float currentHeading = 0;
 float headingHistory[10] = {0, 0, 0, 0, 0};
 int headingIndex = 0;
@@ -85,7 +78,6 @@ float headingOffset = 0.0;
 unsigned long lastMagRead = 0;
 const unsigned long magReadInterval = 50; // Lire toutes les 50ms (20Hz)
 
-// ================= MOTOR APPLY =================
 void applyMotor() {
   if (!motorOn) {
     ledcWrite(RPWM, 0);
@@ -106,7 +98,6 @@ void applyMotor() {
   }
 }
 
-// ================= SERVO CONTROL =================
 void applyServo(int angle) {
 
   static unsigned long lastMove = 0;
@@ -121,29 +112,26 @@ void applyServo(int angle) {
   myServo.write(lastAngle);
 }
 
-// ================= SPEED CALCULATION =================
 void calculateSpeed() {
   unsigned long currentTime = millis();
   
-  // Calcul toutes les 1 seconde
+ 
   if (currentTime - lastSpeedCalc >= 1000) {
-    // Calcul RPM
+   
     currentRPM = (int)((pulseCount / PULSES_PER_ROTATION) * 60);
     
-    // Calcul vitesse (à calibrer selon votre système)
+    
     currentSpeed = currentRPM * SPEED_CALIBRATION;
     
-    // Debug
+  
     Serial.printf("[SPEED] Pulses:%d RPM:%d Speed:%.2f\n", 
                   pulseCount, currentRPM, currentSpeed);
     
-    // Reset du compteur
     pulseCount = 0;
     lastSpeedCalc = currentTime;
   }
 }
 
-// ================= I2C SCANNER =================
 void scanI2C() {
   Serial.println("\n=== Scan I2C ===");
   byte error, address;
@@ -170,11 +158,9 @@ void scanI2C() {
   Serial.println("================\n");
 }
 
-// ================= MAGNETOMETER INIT =================
 bool initMagnetometer() {
   Serial.println("\n=== Init Magnétomètre ===");
   
-  // Initialiser I2C avec pins explicites
   Wire.begin(I2C_SDA, I2C_SCL);
   Wire.setClock(400000); // 400kHz
   delay(100);
@@ -206,7 +192,7 @@ bool initMagnetometer() {
   }
 }
 
-// ================= READ MAGNETOMETER =================
+// READ MAGNETOMETER
 void readMagnetometer() {
   if (!magInitialized) return;
   
@@ -217,7 +203,7 @@ void readMagnetometer() {
   magZ = bmm.raw_mag_data.raw_dataz;
 }
 
-// ================= HEADING CALCULATION =================
+// HEADING CALCULATION
 float calculateHeading() {
 
   float x = magX;
@@ -236,7 +222,7 @@ float calculateHeading() {
   return heading;
 }
 
-// ================= SMOOTH HEADING =================
+// SMOOTH HEADING 
 float smoothHeading(float newHeading) {
 
   headingHistory[headingIndex] = newHeading;
@@ -251,7 +237,7 @@ float smoothHeading(float newHeading) {
   return sum / 10.0;
 }
 
-// ================= AUTOPILOT CONTROL =================
+// AUTOPILOT CONTROL
 void autopilotControl() {
 
   if (!autopilotActive || !magInitialized) return;
@@ -273,13 +259,12 @@ void autopilotControl() {
   if (error > 180) error -= 360;
   if (error < -180) error += 360;
 
-  // DEAD BAND (important for boats)
   if (abs(error) < 8) {
     applyServo(90);
     return;
   }
 
-  // ===== PID =====
+  // PID calculations
 
   float P = Kp * error;
 
@@ -294,7 +279,6 @@ void autopilotControl() {
 
   lastError = error;
 
-  // Convert PID output to servo angle
   int servoAngle = 90 + pid;
 
   servoAngle = constrain(servoAngle, 65, 115);
@@ -315,7 +299,7 @@ void autopilotControl() {
   );
 }
 
-// ================= HTML PAGE =================
+//  HTML PAGE 
 String buildPage() {
   String html = R"HTML(
 <!DOCTYPE html><html lang="fr">
@@ -998,7 +982,7 @@ setInterval(updateSpeedData, 500);
   return html;
 }
 
-// ================= HTTP REQUEST HANDLER =================
+// HTTP REQUEST HANDLER
 void handleClient(WiFiClient client) {
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');
@@ -1235,7 +1219,7 @@ void setup() {
   lastSpeedCalc = millis();
 }
 
-// ================= LOOP =================
+//  LOOP 
 void loop() {
   unsigned long currentTime = millis();
   

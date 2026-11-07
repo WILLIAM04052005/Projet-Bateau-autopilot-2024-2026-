@@ -1,54 +1,30 @@
-/*
- * Code Arduino/ESP32 pour contrôle de bateau électrique
- * ======================================================
- * 
- * Ce code crée un serveur web qui reçoit les commandes de l'interface React
- * et renvoie les données de télémétrie.
- * 
- * Endpoints:
- * - GET  /status     -> Vérifie la connexion
- * - GET  /telemetry  -> Retourne les données des capteurs
- * - POST /command    -> Reçoit les commandes (heading, power, motorOn, gear)
- * 
- * CONFIGURATION:
- * - Modifiez WIFI_SSID et WIFI_PASSWORD pour le mode Station
- * - Ou utilisez le mode AP (Access Point) avec les valeurs par défaut
- */
-
 #include <WiFi.h>
 #include <WebServer.h>
 #include <ArduinoJson.h>
 
-// ============ CONFIGURATION WiFi ============
-// Mode Station (se connecte à votre réseau WiFi)
-// const char* WIFI_SSID = "VotreSSID";
-// const char* WIFI_PASSWORD = "VotreMotDePasse";
-// #define WIFI_MODE_AP false
+// CONFIGURATION WiFi
 
-// Mode Access Point (crée son propre réseau)
 const char* AP_SSID = "BoatControl";
 const char* AP_PASSWORD = "12345678";
 #define WIFI_MODE_AP true
 
-// ============ PINS (À adapter selon votre montage) ============
-#define PIN_MOTOR_PWM     25    // PWM pour contrôle puissance moteur
-#define PIN_MOTOR_ENABLE  26    // Enable moteur
-#define PIN_MOTOR_DIR_A   27    // Direction A (forward)
-#define PIN_MOTOR_DIR_B   14    // Direction B (reverse)
-#define PIN_SERVO_DIR     13    // Servo pour direction
+//PINS 
+#define PIN_MOTOR_PWM     25    
+#define PIN_MOTOR_ENABLE  26    
+#define PIN_MOTOR_DIR_A   27    
+#define PIN_MOTOR_DIR_B   14    
+#define PIN_SERVO_DIR     13    
 
-#define PIN_VOLTAGE_SENSOR 34   // Capteur tension (ADC)
-#define PIN_CURRENT_SENSOR 35   // Capteur courant (ADC)
-#define PIN_SPEED_SENSOR   32   // Capteur vitesse (pulse)
+#define PIN_VOLTAGE_SENSOR 34   
+#define PIN_CURRENT_SENSOR 35   
+#define PIN_SPEED_SENSOR   32  
 
-// ============ VARIABLES GLOBALES ============
 WebServer server(80);
 
-// État des commandes
-int currentHeading = 0;      // 0-360 degrés
-int currentPower = 0;        // 0-100%
+int currentHeading = 0;      
+int currentPower = 0;       
 bool motorOn = false;
-String currentGear = "neutral"; // forward, neutral, reverse
+String currentGear = "neutral"; 
 
 // Télémétrie
 float actualPower = 0;
@@ -60,19 +36,17 @@ float voltage = 48.0;
 volatile unsigned long pulseCount = 0;
 unsigned long lastSpeedCalc = 0;
 
-// ============ INTERRUPTION CAPTEUR VITESSE ============
 void IRAM_ATTR speedPulseISR() {
   pulseCount++;
 }
 
-// ============ HEADERS CORS ============
 void sendCorsHeaders() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
   server.sendHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   server.sendHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
-// ============ HANDLERS HTTP ============
+//HANDLERS HTTP 
 
 // OPTIONS pour CORS preflight
 void handleOptions() {
@@ -142,19 +116,11 @@ void handleCommand() {
   }
 }
 
-// ============ FONCTIONS DE CONTRÔLE MOTEUR ============
+//  FONCTIONS DE CONTRÔLE MOTEUR
 
 void applyDirection() {
-  // Convertit le heading (0-360) en position servo
-  // Adaptez selon votre servo et montage
+  
   int servoPos = map(currentHeading, 0, 360, 0, 180);
-  
-  // Si vous utilisez la librairie ESP32Servo:
-  // directionServo.write(servoPos);
-  
-  // Ou avec ledcWrite pour PWM:
-  // int pwmValue = map(servoPos, 0, 180, 500, 2500); // microsecondes
-  // ledcWrite(0, pwmValue);
   
   Serial.printf("Direction: %d° -> Servo: %d\n", currentHeading, servoPos);
 }
@@ -196,27 +162,23 @@ void applyGear() {
   applyPower();
 }
 
-// ============ LECTURE CAPTEURS ============
+// LECTURE CAPTEURS
 
 void readSensors() {
-  // Lecture tension (adaptez selon votre diviseur de tension)
+
   int rawVoltage = analogRead(PIN_VOLTAGE_SENSOR);
-  // Exemple: diviseur 1:10, ADC 12 bits (0-4095), Vref 3.3V
+
   voltage = (rawVoltage / 4095.0) * 3.3 * 10.0; 
   
-  // Lecture courant (adaptez selon votre capteur ACS712 ou autre)
   int rawCurrent = analogRead(PIN_CURRENT_SENSOR);
-  // Exemple: ACS712-30A, sensibilité 66mV/A, offset 2.5V
+
   float currentVoltage = (rawCurrent / 4095.0) * 3.3;
-  current = (currentVoltage - 1.65) / 0.066; // Ajustez selon votre capteur
+  current = (currentVoltage - 1.65) / 0.066; 
   if (current < 0) current = 0;
   
-  // Calcul vitesse (pulses par seconde -> noeuds)
   unsigned long now = millis();
   if (now - lastSpeedCalc >= 1000) {
-    // Adaptez le facteur selon votre capteur
-    // Exemple: 1 pulse = 0.1 mètre, donc pulses/s * 0.1 = m/s
-    // 1 noeud = 0.5144 m/s
+ 
     float metersPerSecond = pulseCount * 0.1;
     speed = metersPerSecond / 0.5144;
     
@@ -224,7 +186,6 @@ void readSensors() {
     lastSpeedCalc = now;
   }
   
-  // Simulation si pas de capteurs connectés (pour test)
   if (voltage < 1) voltage = 48.0 - (actualPower / 100.0 * 2);
   if (current < 0.1 && motorOn) current = actualPower / 10.0;
   if (speed < 0.1 && motorOn && currentGear != "neutral") {
@@ -232,7 +193,7 @@ void readSensors() {
   }
 }
 
-// ============ SETUP ============
+// SETUP
 
 void setup() {
   Serial.begin(115200);
@@ -244,7 +205,7 @@ void setup() {
   pinMode(PIN_MOTOR_DIR_B, OUTPUT);
   
   // Configuration PWM
-  ledcSetup(1, 5000, 8); // Canal 1, 5kHz, 8 bits
+  ledcSetup(1, 5000, 8); 
   ledcAttachPin(PIN_MOTOR_PWM, 1);
   
   // Configuration capteur vitesse avec interruption
@@ -291,8 +252,6 @@ void setup() {
   Serial.println("  GET  /telemetry  - Get sensor data");
   Serial.println("  POST /command    - Send commands");
 }
-
-// ============ LOOP ============
 
 void loop() {
   server.handleClient();

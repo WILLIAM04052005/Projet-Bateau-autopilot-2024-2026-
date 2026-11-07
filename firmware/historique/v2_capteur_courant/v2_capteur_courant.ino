@@ -3,53 +3,52 @@
 #include <Wire.h>
 #include <bmm150.h>
 
-// ================= I2C PINS =================
+// I2C PINS
 #define I2C_SDA 22
 #define I2C_SCL 21
 
-// ================= SERVO (CODE A) =================
+// SERVO 
 Servo myServo;
 const int servoPin = 18;
 
-// ================= SPEED SENSOR =================
-#define SENSOR_PIN 27  // Broche connectée à DO du capteur de vitesse
+// SPEED SENSOR
+#define SENSOR_PIN 27  
 volatile int pulseCount = 0;
 unsigned long lastSpeedCalc = 0;
 int currentRPM = 0;
-float currentSpeed = 0.0;  // Vitesse en km/h ou nœuds selon calibration
+float currentSpeed = 0.0; 
 
-// Calibration du capteur (à ajuster selon votre capteur et hélice)
 const float PULSES_PER_ROTATION = 1.0;  // Nombre d'impulsions par tour
-const float SPEED_CALIBRATION = 0.1;    // Facteur de conversion RPM -> vitesse (à calibrer)
+const float SPEED_CALIBRATION = 0.1;    
 
-// ================= CAPTEUR DE COURANT =================
-#define PIN_MES 34               // Broche ADC du capteur de courant (ACS712 ou similaire)
-const float VREF_CURRENT = 3.3; // Tension de référence ESP32
-const int ADC_MAX = 4095;       // Résolution ADC 12 bits
-const float SENSITIVITY = 0.04; // Sensibilité V/A (ACS712 5A = 0.185, 20A = 0.100, 30A = 0.066 — ajuster)
-const float CURRENT_OFFSET = 2.5 * 0.4; // Offset capteur (~Vref/2 selon capteur)
+// CAPTEUR DE COURANT 
+#define PIN_MES 34              
+const float VREF_CURRENT = 3.3; 
+const int ADC_MAX = 4095;       
+const float SENSITIVITY = 0.04;
+const float CURRENT_OFFSET = 2.5 * 0.4; 
 
-float currentAmpere = 0.0;      // Courant mesuré en Ampères
+float currentAmpere = 0.0;    
 unsigned long lastCurrentRead = 0;
-const unsigned long currentReadInterval = 500; // Lecture toutes les 500ms
+const unsigned long currentReadInterval = 500;
 
 // Fonction d'interruption pour compter les impulsions
 void IRAM_ATTR countPulse() {
   pulseCount++;
 }
 
-// ================= WIFI =================
+// WIFI CONFIGURATION
 #define USE_AP_MODE true
 
-const char* STA_SSID = "VotreReseau";        // identifiant masqué pour la publication
-const char* STA_PASSWORD = "VotreMotDePasse"; // mot de passe masqué pour la publication
+const char* STA_SSID = "VotreReseau";       
+const char* STA_PASSWORD = "VotreMotDePasse"; 
 
 const char* AP_SSID = "BoatControl";
 const char* AP_PASSWORD = "12345678";
 
 WiFiServer server(80);
 
-// ================= BTS7960 MOTEUR =================
+// BTS7960 MOTEUR
 #define RPWM 25
 #define LPWM 26
 
@@ -61,11 +60,11 @@ int speedVal = 0;
 int heading = 180;
 bool motorOn = false;
 
-// ================= VARIABLES AUTOPILOT =================
+// VARIABLES AUTOPILOT
 bool autopilotActive = false;
 int targetHeading = 0;
 
-// ================= MAGNETOMETER =================
+// MAGNETOMETER 
 BMM150 bmm = BMM150();
 bmm150_mag_data magValue;
 
@@ -74,7 +73,7 @@ int magY = 0;
 int magZ = 0;
 bool magInitialized = false;
 
-// ================= HEADING / AUTOPILOT =================
+//  HEADING / AUTOPILOT
 float currentHeading = 0;
 float headingHistory[10] = {0, 0, 0, 0, 0};
 int headingIndex = 0;
@@ -96,7 +95,7 @@ float headingOffset = 0.0;
 unsigned long lastMagRead = 0;
 const unsigned long magReadInterval = 50; // Lire toutes les 50ms (20Hz)
 
-// ================= CAPTEUR DE COURANT =================
+// CAPTEUR DE COURANT
 float readCurrent(float voltage, float offset) {
   float current = (voltage * 1.063 - offset) / SENSITIVITY;
   if (abs(current) < 0.1) current = 0;
@@ -114,7 +113,7 @@ void updateCurrent() {
   }
 }
 
-// ================= MOTOR APPLY =================
+// MOTOR APPLY
 void applyMotor() {
   if (!motorOn) {
     ledcWrite(RPWM, 0);
@@ -135,7 +134,7 @@ void applyMotor() {
   }
 }
 
-// ================= SERVO CONTROL =================
+// SERVO CONTROL
 void applyServo(int angle) {
 
   static unsigned long lastMove = 0;
@@ -150,11 +149,11 @@ void applyServo(int angle) {
   myServo.write(lastAngle);
 }
 
-// ================= SPEED CALCULATION =================
+// SPEED CALCULATION
 void calculateSpeed() {
   unsigned long currentTime = millis();
   
-  // Calcul toutes les 1 seconde
+  // Calcul toutes les 1 seconde 
   if (currentTime - lastSpeedCalc >= 1000) {
     // Calcul RPM
     currentRPM = (int)((pulseCount / PULSES_PER_ROTATION) * 60);
@@ -172,7 +171,7 @@ void calculateSpeed() {
   }
 }
 
-// ================= I2C SCANNER =================
+// I2C SCANNER
 void scanI2C() {
   Serial.println("\n=== Scan I2C ===");
   byte error, address;
@@ -199,7 +198,7 @@ void scanI2C() {
   Serial.println("================\n");
 }
 
-// ================= MAGNETOMETER INIT =================
+// MAGNETOMETER INIT
 bool initMagnetometer() {
   Serial.println("\n=== Init Magnétomètre ===");
   
@@ -280,7 +279,7 @@ float smoothHeading(float newHeading) {
   return sum / 10.0;
 }
 
-// ================= AUTOPILOT CONTROL =================
+// AUTOPILOT CONTROL
 void autopilotControl() {
 
   if (!autopilotActive || !magInitialized) return;
@@ -308,7 +307,7 @@ void autopilotControl() {
     return;
   }
 
-  // ===== PID =====
+  // PID
 
   float P = Kp * error;
 
@@ -344,7 +343,7 @@ void autopilotControl() {
   );
 }
 
-// ================= HTML PAGE =================
+// HTML PAGE
 String buildPage() {
   String html = R"HTML(
 <!DOCTYPE html><html lang="fr">
@@ -1066,7 +1065,7 @@ setInterval(updateCurrentData, 500);
   return html;
 }
 
-// ================= HTTP REQUEST HANDLER =================
+// HTTP REQUEST HANDLER
 void handleClient(WiFiClient client) {
   String req = client.readStringUntil('\r');
   client.readStringUntil('\n');
@@ -1219,7 +1218,7 @@ void handleClient(WiFiClient client) {
   client.stop();
 }
 
-// ================= SETUP =================
+// SETUP 
 void setup() {
   Serial.begin(115200);
   delay(1000);
@@ -1321,7 +1320,7 @@ void setup() {
   lastCurrentRead = millis();
 }
 
-// ================= LOOP =================
+// LOOP 
 void loop() {
   unsigned long currentTime = millis();
   
