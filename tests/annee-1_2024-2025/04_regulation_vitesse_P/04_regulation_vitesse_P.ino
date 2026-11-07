@@ -1,14 +1,3 @@
-/*
- * 04_regulation_vitesse_P
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE / MIA
- *
- * Régulation de VITESSE du moteur par correcteur proportionnel (Kp = 0.1, consigne 1.5 rad/s).
- * Codeur incrémental 4500 points/tour, calcul toutes les 10 ms (FlexiTimer2), pont en H L293D.
- * Bibliothèques : FlexiTimer2, digitalWriteFast. Carte : Arduino UNO.
- *
- * Fichier d'origine : Speed_control/Speed_control.ino
- */
-
 //This code regulates the speed of the motor about the desired
 //reference following Figure 4, where C(s) is the proportional 
 //controller.

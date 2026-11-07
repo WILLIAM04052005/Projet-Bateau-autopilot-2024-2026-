@@ -1,17 +1,3 @@
-/*
- * 08_maquette_autopilote
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE / MIA
- *
- * Programme principal de la maquette (prototype de fin d'année) : boussole QMC5883L, servo du safran,
- * moteur DC + bouton de sens, capteur de vitesse (roue 20 trous), capteur de courant ACS712, LCD I2C.
- * ⚠ Fichier INCOMPLET tel que récupéré : les fonctions readCompass(), measureCurrent(), measureSpeed(),
- *   controlDirection(), controlPropulsion() et updateDisplay() appelées dans loop() ne sont pas présentes.
- *   Conservé pour l'historique ; la logique d'autopilote complète est dans le test 07.
- *
- * Fichier d'origine : BoatAutopilot-maquette/BoatAutopilot-III.ino
- */
-
-
 //-----Compass-----//
 
 #include <Wire.h>

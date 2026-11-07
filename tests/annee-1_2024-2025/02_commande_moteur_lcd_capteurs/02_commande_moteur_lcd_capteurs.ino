@@ -1,18 +1,3 @@
-/*
- * 02_commande_moteur_lcd_capteurs
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE
- *
- * Code final du domaine EEE au semestre 2 (simulé sous SimulIDE puis testé) :
- *   - vitesse du moteur réglée au potentiomètre (PWM sur ENA du pont en H) ;
- *   - mesure du courant (ACS712 5 A, 185 mV/A) ;
- *   - mesure des tr/min (capteur infrarouge, roue codeuse 20 trous) ;
- *   - affichage PWM / tr/min / courant sur écran LCD 16x2 (bus parallèle).
- * Carte : Arduino UNO.
- *
- * Source : rapport « EEE DOMAIN S2 Report » (code recopié du PDF). La fin du
- * programme (fin de calculateRPM() et readCurrent()), coupée dans le rapport,
- * est reprise à l'identique de la même version du code (dossier EEE-MIA).
- */
 #include <LiquidCrystal.h>
 
 // Initialisation de l'écran LCD (broches réaffectées)

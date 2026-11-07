@@ -1,15 +1,3 @@
-/*
- * 06_mia_servo_gps
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine MIA, semestre 1
- *
- * Première approche de la navigation : le cap souhaité est réglé au
- * potentiomètre et le servo du safran le rejoint progressivement (1° par
- * tour de boucle, tolérance 5°). Deux modules GPS (TinyGPS++) donnent la
- * position, affichée sur un LCD 16x2 avec l'angle de consigne.
- * Carte : Arduino UNO · Bibliothèques : LiquidCrystal, Servo, SoftwareSerial, TinyGPS++
- *
- * Source : présentation de soutenance du semestre 1 (code recopié du PDF).
- */
 #include <LiquidCrystal.h>
 #include <Servo.h>
 #include <SoftwareSerial.h>

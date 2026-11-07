@@ -1,14 +1,3 @@
-/*
- * 03_mesure_courant_vitesse_lcd_i2c
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE / MIA
- *
- * Banc de commande moteur : vitesse au potentiomètre, sens au bouton (anti-rebond),
- * mesure du courant (ACS712 5 A, calibration du zéro au démarrage, moyenne de 50 mesures),
- * tr/min (capteur IR, roue 20 trous) et affichage sur LCD I2C 16x2. Carte : Arduino UNO.
- *
- * Fichier d'origine : MeasureCurrent/MeasureCurrent.ino
- */
-
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 

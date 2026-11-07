@@ -1,13 +1,3 @@
-/*
- * 05_regulation_position_P
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE / MIA
- *
- * Régulation de POSITION angulaire du moteur par correcteur proportionnel (Kp = 0.56, consigne 2π rad).
- * Même base que le test 04 (codeur 4500 points/tour, FlexiTimer2, L293D).
- *
- * Fichier d'origine : Angle_control/Angle_control.ino
- */
-
 //This code control motor's position  (in rad)
 //based on the encoder counts.
 //INCLUDE

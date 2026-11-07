@@ -1,18 +1,3 @@
-/*
- * 01_pont_h_double_moteur
- * Projet Bateau autopiloté · Année 1 (2024-2025) · Domaine EEE / MIA
- *
- * Test du pont en H double (L298N / Dual DC Motor Driver) : avant, arrière, stop via le moniteur série.
- * Carte : Arduino UNO. Code d'exemple MYBOTIC (Idayu) utilisé pour valider le câblage.
- *
- * Fichier d'origine : Dual_Motor/Dual_Motor.ino
- */
-
-/*************************************
- * Dual Channel DC Motor Driver Board* 
- *  Code Written by Idayu - MYBOTIC  *
- *************************************/
- 
 int IN1 = 12; 
 int IN2 = 11; 
 int IN3 = 7;
