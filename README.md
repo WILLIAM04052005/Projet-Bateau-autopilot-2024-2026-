@@ -1,4 +1,4 @@
-# Bateau autopiloté : de la conception à la navigation sur l'eau
+# Bateau autopiloté : de la conception à la navigation sur l'eau avec une interface de control
 
 > Projet intégrateur sur **deux années académiques (2024-2026)**, ICAM · Bachelor *General Engineering, Innovation & Technology*
 > **2024-2025** : conception, maquette et prototype de la commande · **2025-2026** : construction et tests du bateau autopiloté sur une mare
