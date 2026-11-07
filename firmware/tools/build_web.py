@@ -17,7 +17,7 @@ import argparse
 import re
 from pathlib import Path
 
-DELIM = "HTML"  # délimiteur du raw string literal C++ : R"HTML( ... )HTML"
+DELIM = "HTML" 
 
 
 def inline_assets(src: Path) -> str:
@@ -25,12 +25,12 @@ def inline_assets(src: Path) -> str:
 
     def css_repl(m):
         css = (src / m.group(1)).read_text(encoding="utf-8")
-        css = re.sub(r"\A/\*.*?\*/\s*", "", css, flags=re.S)  # retire l'en-tête de commentaire
+        css = re.sub(r"\A/\*.*?\*/\s*", "", css, flags=re.S)  
         return "<style>\n" + css + "</style>"
 
     def js_repl(m):
         js = (src / m.group(1)).read_text(encoding="utf-8")
-        js = re.sub(r"\A(//[^\n]*\n)+\s*", "", js)  # retire l'en-tête de commentaire
+        js = re.sub(r"\A(//[^\n]*\n)+\s*", "", js)  
         return "<script>\n" + js + "</script>"
 
     html = re.sub(r'<link rel="stylesheet" href="([^"]+)">', css_repl, html)

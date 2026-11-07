@@ -1,16 +1,3 @@
-#!/usr/bin/env node
-/**
- * mock_server.js — Simulateur de l'API HTTP de l'ESP32 (sans matériel)
- *
- * Sert l'interface de firmware/web/ et répond aux mêmes routes que le
- * firmware (/mag, /speed_data, /motor, /dir, /speed, /servo, /autopilot,
- * /calibrate) avec un petit modèle physique : le bateau accélère selon la
- * puissance et tourne selon l'angle du safran. Permet de développer et
- * tester l'interface dans VS Code / le navigateur sans flasher la carte.
- *
- * Utilisation (Node.js ≥ 16, aucune dépendance) :
- *     node firmware/tools/mock_server.js      →  http://localhost:8080
- */
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -19,7 +6,7 @@ const PORT = process.env.PORT || 8080;
 const WEB_DIR = path.join(__dirname, "..", "web");
 const MIME = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript" };
 
-// ------------------------- État simulé du bateau -------------------------
+// État simulé du bateau
 const boat = {
   motorOn: false, direction: "stop", speedVal: 0, servo: 90,
   autopilot: false, targetHeading: 0, heading: 180, headingOffset: 0,
@@ -29,7 +16,6 @@ const boat = {
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 const wrap180 = (e) => ((e + 540) % 360) - 180;
 
-// Boucle de simulation à 20 Hz (même cadence que le PID du firmware)
 setInterval(() => {
   const dt = 0.05;
   const sign = boat.direction === "fwd" ? 1 : boat.direction === "rev" ? -1 : 0;
@@ -47,7 +33,7 @@ setInterval(() => {
   boat.heading = (boat.heading + turnRate * dt + 360) % 360;
 }, 50);
 
-// --------------------------------- API -----------------------------------
+// API 
 const routes = {
   "/mag": () => {
     const h = (boat.heading + boat.headingOffset + 360) % 360;
