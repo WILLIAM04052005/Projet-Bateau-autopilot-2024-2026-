@@ -1,0 +1,18 @@
+# Identifiants Wi-Fi (copier secrets.example.h en secrets.h)
+secrets.h
+
+# Arduino / PlatformIO / VS Code
+build/
+.pio/
+.vscode/
+*.elf
+*.bin
+
+# Node / Python
+node_modules/
+__pycache__/
+*.pyc
+
+# Système
+.DS_Store
+Thumbs.db

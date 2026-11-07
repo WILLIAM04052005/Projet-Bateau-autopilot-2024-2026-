@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Controle Moteur DC</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>ESP32 - Moteur DC</h1>
+<button id="avant" onclick="cmd('avant')">AVANT</button>
+<button id="arriere" onclick="cmd('arriere')">ARRIÈRE</button>
+<button id="stop" onclick="cmd('stop')">STOP</button>
+<h2>Vitesse: <span id="val">0</span></h2>
+<input type="range" min="0" max="255" value="0" oninput="vitesse(this.value)">
+<script src="app.js"></script>
+</body>
+</html>

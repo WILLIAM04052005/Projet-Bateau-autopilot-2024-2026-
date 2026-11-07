@@ -1,0 +1,87 @@
+/* Boat Control — feuille de style de l'interface web embarquée (ESP32) */
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0e1a;color:#e2e8f0;overflow:hidden;touch-action:none}
+.app{max-width:100vw;margin:0 auto;padding:12px;min-height:100vh}
+
+@media (orientation: landscape) {
+  .app{display:flex;flex-direction:column;max-height:100vh;padding:8px}
+  .header{margin-bottom:8px}
+  .controls{flex:1;grid-template-columns:1fr 2fr 1fr;gap:10px;align-items:stretch}
+  .card{padding:10px}
+  .telemetry{grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px}
+}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#1a1f35,#0f1525);border-radius:14px;margin-bottom:12px;border:1px solid #1e293b}
+.header h1{font-size:16px;font-weight:700;background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-left{display:flex;flex-direction:column;gap:2px}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444}
+.status-dot.on{background:#22c55e;box-shadow:0 0 8px #22c55e}
+.mag-status{width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;margin-left:8px}
+.mag-status.ok{background:#22c55e;box-shadow:0 0 8px #22c55e}
+.header-info{font-size:11px;color:#64748b}
+.mode-toggle{display:flex;gap:4px;background:#0f172a;border-radius:10px;padding:3px;border:1px solid #334155}
+.mode-btn{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;border:none;background:transparent;color:#64748b}
+.mode-btn.active{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;box-shadow:0 2px 8px rgba(59,130,246,0.3)}
+
+.controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+
+.card{background:linear-gradient(135deg,#111827,#1a1f35);border-radius:14px;padding:14px;border:1px solid #1e293b;text-align:center}
+.card-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:8px}
+
+.joystick-wrap{position:relative;width:180px;height:180px;margin:0 auto}
+.joystick-bg{width:100%;height:100%;border-radius:50%;border:3px solid #334155;position:relative;background:radial-gradient(circle,#0f172a,#1e293b);box-shadow:inset 0 0 20px rgba(0,0,0,0.5);overflow:hidden}
+.joystick-bg::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:rgba(239,68,68,0.15);border-top:2px dashed #ef4444}
+.joystick-knob{position:absolute;top:50%;left:50%;width:60px;height:60px;background:linear-gradient(135deg,#60a5fa,#3b82f6);border-radius:50%;transform:translate(-50%,-50%);cursor:grab;box-shadow:0 4px 15px rgba(96,165,250,0.4);border:2px solid #1e40af;transition:box-shadow 0.1s;z-index:10}
+.joystick-knob:active{cursor:grabbing;box-shadow:0 6px 25px rgba(96,165,250,0.6)}
+.joystick-center{position:absolute;top:50%;left:50%;width:12px;height:12px;background:#60a5fa;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px #60a5fa;pointer-events:none}
+.joystick-val{font-size:24px;font-weight:700;color:#60a5fa;margin-top:8px;text-shadow:0 2px 10px rgba(96,165,250,0.3)}
+.joystick-dir{font-size:14px;color:#94a3b8;margin-top:4px}
+.servo-indicator{font-size:12px;color:#22c55e;margin-top:4px;font-weight:600}
+
+.motor-btn{width:80px;height:80px;border-radius:50%;border:3px solid #334155;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.motor-btn.off{background:linear-gradient(135deg,#1e293b,#0f172a);color:#64748b}
+.motor-btn.on{background:linear-gradient(135deg,#166534,#15803d);color:#22c55e;border-color:#22c55e;box-shadow:0 0 20px rgba(34,197,94,.3)}
+
+.gear-wrap{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.gear-btn{padding:8px;border:1px solid #334155;background:#1e293b;color:#94a3b8;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.gear-btn.active{border-color:#60a5fa;color:#60a5fa;background:#1e3a5f}
+.gear-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.power-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;height:100%}
+.power-val{font-size:32px;font-weight:800;background:linear-gradient(135deg,#22c55e,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.power-unit{font-size:11px;color:#64748b}
+.power-gauge-container{position:relative;width:50px;height:240px;background:#1e293b;border-radius:25px;border:2px solid #334155;overflow:hidden;box-shadow:inset 0 0 15px rgba(0,0,0,0.5);cursor:pointer;user-select:none}
+.power-gauge-fill{position:absolute;bottom:0;width:100%;background:linear-gradient(to top,#22c55e 0%,#84cc16 25%,#facc15 50%,#fb923c 75%,#ef4444 100%);transition:height 0.2s;border-radius:25px;pointer-events:none}
+
+.telemetry{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.telem-card{background:linear-gradient(135deg,#111827,#1a1f35);border-radius:12px;padding:10px 8px;text-align:center;border:1px solid #1e293b}
+.telem-val{font-size:20px;font-weight:700;color:#60a5fa}
+.telem-unit{font-size:11px;color:#64748b}
+.telem-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#475569;margin-top:4px}
+.telem-card.warn .telem-val{color:#f59e0b}
+.telem-card.crit .telem-val{color:#ef4444}
+.telem-card.batt .telem-val{color:#22c55e}
+.telem-card.mag .telem-val{color:#22c55e}
+.telem-card.speed .telem-val{color:#818cf8;font-size:24px}
+
+.page{display:none}
+.page.active{display:block}
+.autopilot-container{display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px;align-items:start;height:calc(100vh - 140px)}
+.autopilot-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.autopilot-icon{width:280px;height:280px;position:relative}
+.autopilot-status{text-align:center;margin-top:16px}
+.autopilot-status h2{font-size:24px;font-weight:700;color:#60a5fa;margin-bottom:8px}
+.autopilot-status p{font-size:14px;color:#94a3b8}
+.autopilot-heading-display{font-size:18px;color:#22c55e;margin-top:8px;font-weight:600}
+.autopilot-controls{display:flex;gap:12px;margin-top:20px}
+.autopilot-btn{padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;border:2px solid #334155;background:linear-gradient(135deg,#1e293b,#0f172a);color:#94a3b8}
+.autopilot-btn:hover{border-color:#60a5fa;color:#60a5fa;box-shadow:0 0 15px rgba(96,165,250,0.3)}
+.autopilot-btn.active{background:linear-gradient(135deg,#166534,#15803d);color:#22c55e;border-color:#22c55e;box-shadow:0 0 20px rgba(34,197,94,.3)}
+.autopilot-side{display:flex;flex-direction:column;gap:8px}
+.heading-input-card{background:linear-gradient(135deg,#111827,#1a1f35);border-radius:14px;padding:16px;border:1px solid #1e293b;text-align:center}
+.heading-input-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px}
+.heading-input-display{font-size:42px;font-weight:800;color:#60a5fa;margin-bottom:12px}
+.heading-adjust{display:flex;gap:8px;justify-content:center}
+.heading-adjust button{width:50px;height:50px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#60a5fa;font-size:20px;font-weight:700;cursor:pointer;transition:all .2s}
+.heading-adjust button:active{background:#334155;transform:scale(0.95)}

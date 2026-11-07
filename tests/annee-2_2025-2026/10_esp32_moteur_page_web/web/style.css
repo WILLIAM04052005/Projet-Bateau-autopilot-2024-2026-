@@ -1,0 +1,22 @@
+/* Style de la page de test « Contrôle moteur DC » (ESP32) */
+
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+button {
+  padding: 15px 25px;
+  margin: 10px;
+  font-size: 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#avant { background: #00c853; }
+#arriere { background: #2979ff; }
+#stop { background: #d50000; }
+input[type=range] {
+  width: 80%;
+}

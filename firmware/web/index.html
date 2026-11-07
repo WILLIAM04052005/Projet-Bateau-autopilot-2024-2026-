@@ -1,0 +1,220 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Boat Control - Système Complet</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div class="header-left">
+    <h1>⚓ Boat Control - Système Complet</h1>
+    <div class="header-info"><span id="hInfo">Cap: -- | Vitesse: --</span></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btnManual" onclick="switchMode('manual')">Manuel</button>
+      <button class="mode-btn" id="btnAutopilot" onclick="switchMode('autopilot')">Auto-Pilote</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="mag-status" id="magStatus"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page active" id="pageManual">
+
+<div class="controls">
+  <div class="card">
+    <div class="card-label">Direction (Servo)</div>
+    <div class="joystick-wrap" id="joystickWrap">
+      <div class="joystick-bg">
+        <div class="joystick-center"></div>
+        <div class="joystick-knob" id="joystickKnob"></div>
+      </div>
+    </div>
+    <div class="joystick-val" id="headVal">--°</div>
+    <div class="joystick-dir" id="headDir">--</div>
+    <div class="servo-indicator" id="servoAngle">Servo: 90°</div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Moteur</div>
+    <button class="motor-btn off" id="motorBtn" onclick="toggleMotor()">OFF</button>
+    <div class="gear-wrap">
+      <button class="gear-btn" id="gFwd" onclick="setDir('fwd')" disabled>▲ Avant</button>
+      <button class="gear-btn active" id="gN" onclick="setDir('stop')" disabled>■ Stop</button>
+      <button class="gear-btn" id="gRev" onclick="setDir('rev')" disabled>▼ Arrière</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Puissance Moteur</div>
+    <div class="power-wrap">
+      <div class="power-val" id="pwrVal">0</div>
+      <div class="power-unit">/ 255</div>
+      <div class="power-gauge-container" id="powerGauge">
+        <div class="power-gauge-fill" id="powerFill" style="height:0%"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="telemetry">
+  <div class="telem-card speed">
+    <div class="telem-val" id="speedVal">0.0</div>
+    <div class="telem-unit">km/h</div>
+    <div class="telem-label">Vitesse</div>
+  </div>
+  <div class="telem-card">
+    <div class="telem-val" id="rpmVal">0</div>
+    <div class="telem-unit">RPM</div>
+    <div class="telem-label">Rotation</div>
+  </div>
+  <div class="telem-card mag">
+    <div class="telem-val" id="currentHeading">--</div>
+    <div class="telem-unit">°</div>
+    <div class="telem-label">Cap Réel</div>
+  </div>
+  <div class="telem-card">
+    <div class="telem-val" id="magX">--</div>
+    <div class="telem-unit">raw</div>
+    <div class="telem-label">MAG X</div>
+  </div>
+  <div class="telem-card">
+    <div class="telem-val" id="magY">--</div>
+    <div class="telem-unit">raw</div>
+    <div class="telem-label">MAG Y</div>
+  </div>
+  <div class="telem-card">
+    <div class="telem-val" id="currentVal">0.00</div>
+    <div class="telem-unit">A</div>
+    <div class="telem-label">Courant</div>
+  </div>
+</div>
+
+</div>
+
+<div class="page" id="pageAutopilot">
+<div class="autopilot-container">
+  
+  <div class="autopilot-side">
+    <div class="telem-card speed">
+      <div class="telem-val" id="speedValAuto">0.0</div>
+      <div class="telem-unit">km/h</div>
+      <div class="telem-label">Vitesse</div>
+    </div>
+    <div class="telem-card">
+      <div class="telem-val" id="rpmValAuto">0</div>
+      <div class="telem-unit">RPM</div>
+      <div class="telem-label">Rotation</div>
+    </div>
+    <div class="telem-card mag">
+      <div class="telem-val" id="currentHeadingAuto">--</div>
+      <div class="telem-unit">°</div>
+      <div class="telem-label">Cap Réel</div>
+    </div>
+    <div class="telem-card">
+      <div class="telem-val" id="magXAuto">--</div>
+      <div class="telem-unit">raw</div>
+      <div class="telem-label">MAG X</div>
+    </div>
+    <div class="telem-card">
+      <div class="telem-val" id="magYAuto">--</div>
+      <div class="telem-unit">raw</div>
+      <div class="telem-label">MAG Y</div>
+    </div>
+    <div class="telem-card">
+      <div class="telem-val" id="currentValAuto">0.00</div>
+      <div class="telem-unit">A</div>
+      <div class="telem-label">Courant</div>
+    </div>
+  </div>
+
+  <div class="autopilot-center">
+    <svg class="autopilot-icon" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="150" cy="150" r="140" fill="none" stroke="#1e293b" stroke-width="2"/>
+      <circle cx="150" cy="150" r="110" fill="none" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <circle cx="150" cy="150" r="80" fill="none" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <circle cx="150" cy="150" r="50" fill="none" stroke="#1e293b" stroke-width="1" stroke-dasharray="4 4"/>
+      <line x1="150" y1="10" x2="150" y2="290" stroke="#334155" stroke-width="1" opacity="0.3"/>
+      <line x1="10" y1="150" x2="290" y2="150" stroke="#334155" stroke-width="1" opacity="0.3"/>
+      <line id="trajectoryLine" x1="150" y1="150" x2="150" y2="30" stroke="#60a5fa" stroke-width="3" stroke-dasharray="8 4" opacity="0.8"/>
+      <g id="compassRose">
+        <text x="150" y="25" text-anchor="middle" fill="#60a5fa" font-size="14" font-weight="700">N</text>
+        <text x="275" y="155" text-anchor="middle" fill="#64748b" font-size="12">E</text>
+        <text x="150" y="285" text-anchor="middle" fill="#64748b" font-size="12">S</text>
+        <text x="25" y="155" text-anchor="middle" fill="#64748b" font-size="12">W</text>
+      </g>
+      <g id="boatIcon" transform="translate(150, 150)">
+        <path d="M -15,-25 L -8,-20 L -8,20 L -12,25 L 12,25 L 8,20 L 8,-20 L 15,-25 Z" 
+              fill="url(#boatGradient)" stroke="#60a5fa" stroke-width="2"/>
+        <rect x="-6" y="-15" width="12" height="8" fill="#1e3a8a" opacity="0.6" rx="2"/>
+        <rect x="-4" y="5" width="8" height="12" fill="#1e3a8a" opacity="0.4" rx="1"/>
+        <path d="M 0,-28 L -4,-22 L 4,-22 Z" fill="#22c55e" id="boatDirection"/>
+      </g>
+      <circle cx="150" cy="150" r="3" fill="#60a5fa"/>
+      <circle cx="150" cy="150" r="8" fill="none" stroke="#60a5fa" stroke-width="1"/>
+      <defs>
+        <linearGradient id="boatGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="autopilot-status">
+      <h2 id="autopilotStatusText">Pilote Automatique Désactivé</h2>
+      <p id="autopilotCourse">Cap cible: <span id="autopilotHeading">0°</span></p>
+      <p class="autopilot-heading-display">Cap actuel: <span id="autopilotCurrentHeading">--°</span> | Erreur: <span id="autopilotError">--°</span></p>
+    </div>
+
+    <div class="autopilot-controls">
+      <button class="autopilot-btn" id="autopilotToggle" onclick="toggleAutopilot()">
+        Activer Auto-Pilote
+      </button>
+    </div>
+
+  </div>
+
+  <div class="autopilot-side">
+    <div class="heading-input-card">
+      <div class="heading-input-label">Cap Cible</div>
+      <div class="heading-input-display" id="targetHeadingDisplay">0°</div>
+      <div class="heading-adjust">
+        <button onclick="adjustTargetHeading(-10)">-10</button>
+        <button onclick="adjustTargetHeading(-1)">-1</button>
+        <button onclick="adjustTargetHeading(1)">+1</button>
+        <button onclick="adjustTargetHeading(10)">+10</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-label">Caps Rapides</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <button onclick="setTargetHeading(0)" style="padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#60a5fa;font-size:12px;cursor:pointer">N (0°)</button>
+        <button onclick="setTargetHeading(90)" style="padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#60a5fa;font-size:12px;cursor:pointer">E (90°)</button>
+        <button onclick="setTargetHeading(180)" style="padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#60a5fa;font-size:12px;cursor:pointer">S (180°)</button>
+        <button onclick="setTargetHeading(270)" style="padding:8px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#60a5fa;font-size:12px;cursor:pointer">W (270°)</button>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-label">Calibration Magnétomètre</div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-top:8px">
+        <button onclick="calibrateCompass()" style="padding:10px;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#22c55e;font-size:12px;cursor:pointer;font-weight:600">🧭 Définir Nord Actuel</button>
+        <p style="font-size:10px;color:#64748b;text-align:center;margin-top:4px">Pointez le bateau vers le Nord et cliquez</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+</div>
+
+<script src="app.js"></script>
+</body></html>
